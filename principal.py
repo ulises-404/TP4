@@ -2,9 +2,18 @@ import clase
 import pickle
 import os
 
+#Busqueda binaria r3.1/r3.2
+def busqeda_secuencial(destinatario, v):
+    for i in range(len(v)):
+        if destinatario == v[i].identificacion_destinatario:
+            return i
+    return -1
+
+
+
 
 #r1.1 // r1.2
-def busqueda_binaria(v, x):
+def insercion_ordenada(v, x): #insercion ordenada
     n = len(v)
     izq = 0
     der = n - 1
@@ -28,7 +37,7 @@ def cargar_envios():
     for linea in archivo:
         if linea.strip() != "":
             envio = clase.generar_envio(linea)
-            busqueda_binaria(v, envio)
+            insercion_ordenada(v, envio)
     archivo.close()
 
     i = int(input("Ingrese índice: "))
@@ -105,6 +114,23 @@ def gen_binario_matriz(v):
         envio = pickle.load(archivo)
         print(envio)
     archivo.close()
+
+#------------------------R3.1/3.2-----------------------------------
+def buscar_envio(v):
+    idd = input("Ingresa una identificacion de destinatario a buscar: ")
+    r = busqeda_secuencial(idd, v)
+
+    if r != -1:
+        print("3r.1: ",v[r].monto_nominal)
+
+        incremento = round((v[r].monto_nominal * 17) // 100, -2)
+        v[r].monto_nominal += incremento
+
+        print("3r.2: ", v[r].monto_nominal)
+    else:
+        print("r3.1: ",0)
+        print("3r.2: ",0)
+
 
 #--------------DEL TP3---------------------------
 def mayor_monto_por_moneda(envios):
@@ -258,12 +284,15 @@ def principal():
     while op != 0:
         print("1. Cargar envíos")
         print("2. Generar archivo binario")
+        print("3. Buscar envio")
         print("0. Salir")
         op = int(input("Ingrese opción: "))
         if op == 1:
             v = cargar_envios()
         elif op == 2:
             gen_binario_matriz(v)
+        elif op == 3:
+            buscar_envio(v)
         elif op == 0:
             print("Programa finalizado.")
 
