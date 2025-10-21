@@ -3,7 +3,7 @@ import pickle
 import os
 
 
-#r1.1
+#r1.1 // r1.2
 def busqueda_binaria(v, x):
     n = len(v)
     izq = 0
@@ -32,12 +32,41 @@ def cargar_envios():
     archivo.close()
 
     i = int(input("Ingrese índice: "))
+
     if 0 <= i < len(v):
         print("r1.1:", v[i].obtener_identificador_pago())
+
     else:
         print("r1.1: Índice fuera de rango")
 
+    #R1.2-------------------------------------------------------------
+    if (i % 2) != 0: # Si el indice es impar...
+
+        indice_r2 = (i * 3) + 1
+        if 0 <= indice_r2 < len(v):
+            print("r1.2:", v[indice_r2].obtener_identificador_pago())
+
+        else:
+
+            # Fuera de rango - indice impar . . .
+            indice_r2 = len(v) - 1
+            print("r1.2: Índice fuera de rango")
+            print("r1.2:", v[indice_r2].obtener_identificador_pago())
+
+    elif (i % 2) == 0: #Indice par...
+        indice_r2 = i // 2
+        if 0 <= indice_r2 < len(v):
+            print("r1.2:", v[indice_r2].obtener_identificador_pago())
+
+        else: # Fuera de rango - indice par . . .
+            indice_r2 = len(v) - 1
+            print("r1.2: Índice fuera de rango")
+            print("r1.2:", v[indice_r2].obtener_identificador_pago())
+    #----------------------------------------------------------------
+
     return v
+
+
 
 #r2.1
 def gen_binario_matriz(v):
@@ -101,6 +130,7 @@ def mostrar_matriz(matriz, monedas):
     for i in range(n):
         for j in range(n):
             print(f"Origen {monedas[i]} Destino {monedas[j]}: {round(matriz[i][j], 2)}")
+
 
 def monto_final(monto_base, alg_imp):
     monto_final = 0
@@ -200,7 +230,6 @@ def mostrar(v):
     mostrar_matriz(matriz, monedas)
 
 
-
 def pasaje_desde_csv(linea):
 
     partes1 = linea[0].split("|")
@@ -218,6 +247,10 @@ def pasaje_desde_csv(linea):
     envio = clase.Envio(mod_origen, mod_pago, id_pago, identificacion, nombre, tasa, monto, alg_comision, alg_impositivo)
 
     return envio
+
+
+#-----------------------------------------
+
 
 def principal():
     v = []
