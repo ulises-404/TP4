@@ -2,34 +2,42 @@ import clase
 import pickle
 import os
 
+
 #Busqueda binaria r3.1/r3.2
-def busqeda_secuencial(destinatario, v):
-    for i in range(len(v)):
-        if destinatario == v[i].identificacion_destinatario:
-            return i
+def busqueda_binaria(idd, v):
+    n = len(v)
+    izq, der = 0, n
+    while izq <= der:
+        c = (izq + der) // 2
+        if v[c].identificacion_destinatario == idd:
+            return c
+        else:
+            if idd > v[c].identificacion_destinatario:
+                der = c - 1
+            else:
+                izq = c + 1
+
     return -1
 
 
-
-
-#r1.1 // r1.2
 def insercion_ordenada(v, x): #insercion ordenada
     n = len(v)
-    izq = 0
-    der = n - 1
+    pos = n
+    izq, der = 0, n-1
     while izq <= der:
-        i = (izq + der) // 2
-        if v[i].codigo == x.codigo:
-            pos = i
+        c = (izq + der) // 2
+        if v[c].identificacion_destinatario == x.identificacion_destinatario:
+            pos = c
             break
         else:
-            if v[i].codigo < x.codigo:
-                der = i - 1
+            if x.identificacion_destinatario > v[c].identificacion_destinatario:
+                der = c - 1
             else:
-                izq = i + 1
+                izq = c + 1
     if izq > der:
         pos = izq
     v[pos:pos] = [x]
+
 
 def cargar_envios():
     v = []
@@ -48,7 +56,7 @@ def cargar_envios():
     else:
         print("r1.1: Índice fuera de rango")
 
-    #R1.2-------------------------------------------------------------
+    # R1.2-------------------------------------------------------------
     if (i % 2) != 0: # Si el indice es impar...
 
         indice_r2 = (i * 3) + 1
@@ -71,43 +79,37 @@ def cargar_envios():
             indice_r2 = len(v) - 1
             print("r1.2: Índice fuera de rango")
             print("r1.2:", v[indice_r2].obtener_identificador_pago())
-    #----------------------------------------------------------------
+    # ----------------------------------------------------------------
 
     return v
 
 
-
-#r2.1
-def gen_binario_matriz(v):
+# r2.1
+def gen_binario_matriz(v, nombre):
     if not v:
         print("Debe cargar primero los envíos (opción 1).")
         return
 
-    monedas = ["ARS", "USD", "EUR", "GBP", "JPY"]
-    n = len(monedas)
-
-    matriz = [[0, 0] for _ in range(n)]
+    c = ac = 0
 
     for envio in v:
         _, comision = monto_base(envio.monto_nominal, envio.algoritmo_comision)
-        i = envio.obtener_codigo_moneda_origen() - 1
-        matriz[i][0] += comision
-        matriz[i][1] += 1
+        c += 1
+        ac += comision
 
-    promedios = [0] * n
-    for i in range(n):
-        if matriz[i][1] != 0:
-            promedios[i] = matriz[i][0] / matriz[i][1]
+    promedio = 0
+    if c != 0:
+        promedio = ac // c
 
-    nombre = "envios_filtrados.dat"
     archivo = open(nombre, "wb")
     for envio in v:
         _, comision = monto_base(envio.monto_nominal, envio.algoritmo_comision)
-        i = envio.obtener_codigo_moneda_origen() - 1
-        if comision > promedios[i]:
+        if comision > promedio:
             pickle.dump(envio, archivo)
     archivo.close()
 
+
+def mostrar_archivo_bin(nombre):
     archivo = open(nombre, "rb")
     tamanio = os.path.getsize(nombre)
     while archivo.tell() < tamanio:
@@ -115,47 +117,48 @@ def gen_binario_matriz(v):
         print(envio)
     archivo.close()
 
-#------------------------R3.1/3.2-----------------------------------
+
+# ------------------------R3.1/3.2-----------------------------------
 def buscar_envio(v):
     idd = input("Ingresa una identificacion de destinatario a buscar: ")
-    r = busqeda_secuencial(idd, v)
-
+    r = busqueda_binaria(idd, v)
+    print("r: ", r)
     if r != -1:
-        print("3r.1: ",v[r].monto_nominal)
+        print("r3.1: ", v[r].monto_nominal)
+        incremento = v[r].monto_nominal * 1.17
+        v[r].monto_nominal = round(incremento, -2)
+        print("r3.2: ", v[r].monto_nominal)
 
-        incremento = round((v[r].monto_nominal * 17) // 100, -2)
-        v[r].monto_nominal += incremento
-
-        print("3r.2: ", v[r].monto_nominal)
     else:
-        print("r3.1: ",0)
-        print("3r.2: ",0)
+        print("r3.1: ", 0)
+        print("r3.2: ", 0)
 
 
-#--------------DEL TP3---------------------------
+# --------------DEL TP3---------------------------
 def mayor_monto_por_moneda(envios):
-    monedas = ["ARS", "USD", "EUR", "GBP", "JPY"]
-    n = len(monedas)
-    matriz = []
-    for i in range(n):
-        fila = [0] * n
-        matriz.append(fila)
-
+    matriz_montos = [[0] * 5 for _ in range(5)]
+    matriz_envios = [[0] * 5 for _ in range(5)]
+    monto_mayor = 0
     for envio in envios:
+        moneda_origen = envio.obtener_codigo_moneda_origen()
+        moneda_destino = envio.obtener_codigo_moneda_destino()
         monto_b, _ = monto_base(envio.monto_nominal, envio.algoritmo_comision)
         monto_f = monto_final(monto_b, envio.algoritmo_impositivo)
-        i = envio.obtener_codigo_moneda_origen() - 1
-        j = envio.obtener_codigo_moneda_destino() - 1
-        if monto_f > matriz[i][j]:
-            matriz[i][j] = monto_f
-    return matriz, monedas
+
+        f = moneda_origen - 1
+        c = moneda_destino - 1
+
+        if monto_f > matriz_montos[f][c]:
+            matriz_montos[f][c] = monto_f
+            matriz_envios[f][c] = envio
+
+    return matriz_envios
 
 
-def mostrar_matriz(matriz, monedas):
-    n = len(monedas)
-    for i in range(n):
-        for j in range(n):
-            print(f"Origen {monedas[i]} Destino {monedas[j]}: {round(matriz[i][j], 2)}")
+def mostrar_matriz(matriz_envios):
+    for f in range(5):
+        for c in range(5):
+            print("r4.1: ", matriz_envios[f][c].codigo)
 
 
 def monto_final(monto_base, alg_imp):
@@ -229,33 +232,6 @@ def monto_base(monto_nominal, alg_comision):
     return monto_base, comision
 
 
-def mostrar(v):
-    suma_porc = 0
-    max_porc = 0
-    id_pago_max = ""
-    monto_final_max = 0
-
-    for envio in v:
-        monto_b, comision = monto_base(envio.monto_nominal, envio.algoritmo_comision)
-        porc_comision = (comision / envio.monto_nominal) * 100
-        suma_porc += porc_comision
-
-        monto_f = monto_final(monto_b, envio.algoritmo_impositivo)
-        desc_total = envio.monto_nominal - monto_f
-        porc_desc = (desc_total / envio.monto_nominal) * 100
-
-        if porc_desc > max_porc:
-            max_porc = porc_desc
-            monto_final_max = round(monto_f, 2)
-            id_pago_max = str(envio.obtener_identificador_pago())
-
-    promedio_comisiones = suma_porc / len(v)
-
-    matriz, monedas = mayor_monto_por_moneda(v)
-
-    mostrar_matriz(matriz, monedas)
-
-
 def pasaje_desde_csv(linea):
 
     partes1 = linea[0].split("|")
@@ -275,26 +251,31 @@ def pasaje_desde_csv(linea):
     return envio
 
 
-#-----------------------------------------
-
-
 def principal():
     v = []
     op = -1
+    nombre = "envios_filtrados.dat"
     while op != 0:
         print("1. Cargar envíos")
-        print("2. Generar archivo binario")
-        print("3. Buscar envio")
+        print("2. Mostrar listado")
+        print("3. Buscar")
+        print("4. Mayores")
         print("0. Salir")
         op = int(input("Ingrese opción: "))
+
         if op == 1:
             v = cargar_envios()
         elif op == 2:
-            gen_binario_matriz(v)
+            gen_binario_matriz(v, nombre)
+            mostrar_archivo_bin(nombre)
         elif op == 3:
             buscar_envio(v)
+        elif op == 4:
+            matriz_envios = mayor_monto_por_moneda(v)
+            mostrar_matriz(matriz_envios)
         elif op == 0:
             print("Programa finalizado.")
+
 
 if __name__ == '__main__':
     principal()
