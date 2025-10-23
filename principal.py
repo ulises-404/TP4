@@ -2,6 +2,31 @@ import clase
 import pickle
 import os
 
+#r2.2
+def mayor_comision_por_origen(envios):
+    matriz_envios = [[0] * 5 for _ in range(5)]
+    matriz_comisiones = [[0] * 5 for _ in range(5)]
+
+    for envio in envios:
+        f = envio.obtener_codigo_moneda_origen() - 1
+        c = envio.obtener_codigo_moneda_destino() - 1
+        _, comision = monto_base(envio.monto_nominal, envio.algoritmo_comision)
+
+        if comision > matriz_comisiones[f][c]:
+            matriz_comisiones[f][c] = comision
+            matriz_envios[f][c] = envio
+    monedas = ["ARS", "USD", "EUR", "GBP", "JPY"]
+
+    for f in range(5):
+        max_comision = -1
+        envio_max = None
+        for c in range(5):
+            if matriz_comisiones[f][c] > max_comision:
+                max_comision = matriz_comisiones[f][c]
+                envio_max = matriz_envios[f][c]
+        if envio_max != 0:
+            print(f"r2.2 : Moneda origen {monedas[f]} - Envío {envio_max} - Comisión {round(max_comision, 2)}")
+
 
 # R4.1-------------------------------------------------------------
 
@@ -279,11 +304,13 @@ def principal():
         elif op == 2:
             gen_binario_matriz(v, nombre)
             mostrar_archivo_bin(nombre)
+            mayor_comision_por_origen(v)
         elif op == 3:
             buscar_envio(v)
         elif op == 4:
             matriz_envios = mayor_monto_por_moneda(v)
             mostrar_matriz(matriz_envios)
+
 
         elif op == 0:
             print("Programa finalizado.")
