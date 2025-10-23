@@ -28,7 +28,7 @@ def mostrar_matriz(matriz_envios):
 
     for f in range(5):
         for c in range(5):
-            print("Origen: ",monedas[f + 1],"Destino: ",monedas[c + 1]," :",matriz_envios[f][c].codigo)
+            print("Origen ",monedas[f + 1],"Destino ",monedas[c + 1]," :",matriz_envios[f][c].codigo)
 
 
 
@@ -170,24 +170,6 @@ def buscar_envio(v):
 
 
 # --------------DEL TP3---------------------------
-def mayor_monto_por_moneda(envios):
-    matriz_montos = [[0] * 5 for _ in range(5)]
-    matriz_envios = [[0] * 5 for _ in range(5)]
-    monto_mayor = 0
-    for envio in envios:
-        moneda_origen = envio.obtener_codigo_moneda_origen()
-        moneda_destino = envio.obtener_codigo_moneda_destino()
-        monto_b, _ = monto_base(envio.monto_nominal, envio.algoritmo_comision)
-        monto_f = monto_final(monto_b, envio.algoritmo_impositivo)
-
-        f = moneda_origen - 1
-        c = moneda_destino - 1
-
-        if monto_f > matriz_montos[f][c]:
-            matriz_montos[f][c] = monto_f
-            matriz_envios[f][c] = envio
-
-    return matriz_envios
 
 
 def monto_final(monto_base, alg_imp):
@@ -309,6 +291,3 @@ def principal():
 
 if __name__ == '__main__':
     principal()
-
-
-
