@@ -28,7 +28,7 @@ def mostrar_matriz(matriz_envios):
 
     for f in range(5):
         for c in range(5):
-            print("Origen: ",monedas[f + 1],"Destino: ",monedas[c + 1]," :",matriz_envios[f][c].codigo)
+            print("Origen ",monedas[f + 1],"Destino ",monedas[c + 1]," :",matriz_envios[f][c].codigo)
 
 
 # R4.1-------------------------------------------------------------
@@ -308,4 +308,5 @@ def principal():
 
 if __name__ == '__main__':
     principal()
+
 
