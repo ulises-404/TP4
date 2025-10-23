@@ -24,11 +24,12 @@ def mayor_monto_por_moneda(envios):
 
 
 def mostrar_matriz(matriz_envios):
-    monedas = {1: "ARS", 2: "USD", 3: "EUR", 4: "GBP", 5: "JPY"}
+    monedas = ["","ARS","USD","EUR","GBP","JPY"]
 
     for f in range(5):
         for c in range(5):
-            print("Origen ",monedas[f + 1],"Destino ",monedas[c + 1]," :",matriz_envios[f][c].codigo)
+            print("Origen: ",monedas[f + 1],"Destino: ",monedas[c + 1]," :",matriz_envios[f][c].codigo)
+
 
 
 # R4.1-------------------------------------------------------------
@@ -308,5 +309,6 @@ def principal():
 
 if __name__ == '__main__':
     principal()
+
 
 
