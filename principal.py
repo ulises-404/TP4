@@ -3,6 +3,40 @@ import pickle
 import os
 
 
+# R4.1-------------------------------------------------------------
+
+def mayor_monto_por_moneda(envios):
+    matriz_montos = [[0] * 5 for _ in range(5)]
+    matriz_envios = [[0] * 5 for _ in range(5)]
+    monto_mayor = 0
+    for envio in envios:
+        moneda_origen = envio.obtener_codigo_moneda_origen()
+        moneda_destino = envio.obtener_codigo_moneda_destino()
+        monto_b, _ = monto_base(envio.monto_nominal, envio.algoritmo_comision)
+        monto_f = monto_final(monto_b, envio.algoritmo_impositivo)
+        f = moneda_origen - 1
+        c = moneda_destino - 1
+        if monto_f > matriz_montos[f][c]:
+            matriz_montos[f][c] = monto_f
+            matriz_envios[f][c] = envio
+
+    return matriz_envios
+
+
+def mostrar_matriz(matriz_envios):
+    monedas = {1: "ARS", 2: "USD", 3: "EUR", 4: "GBP", 5: "JPY"}
+
+    for f in range(5):
+        for c in range(5):
+            print("Origen: ",monedas[f + 1],"Destino: ",monedas[c + 1]," :",matriz_envios[f][c].codigo)
+
+
+# R4.1-------------------------------------------------------------
+
+
+
+
+
 #Busqueda binaria r3.1/r3.2
 def busqueda_binaria(idd, v):
     n = len(v)
@@ -54,7 +88,9 @@ def cargar_envios():
         print("r1.1:", v[i].obtener_identificador_pago())
 
     else:
-        print("r1.1: Índice fuera de rango")
+        r1_indice = len(v) - 1
+        print("r1.1:", v[r1_indice].obtener_identificador_pago())
+
 
     # R1.2-------------------------------------------------------------
     if (i % 2) != 0: # Si el indice es impar...
@@ -67,7 +103,6 @@ def cargar_envios():
 
             # Fuera de rango - indice impar . . .
             indice_r2 = len(v) - 1
-            print("r1.2: Índice fuera de rango")
             print("r1.2:", v[indice_r2].obtener_identificador_pago())
 
     elif (i % 2) == 0: #Indice par...
@@ -77,7 +112,6 @@ def cargar_envios():
 
         else: # Fuera de rango - indice par . . .
             indice_r2 = len(v) - 1
-            print("r1.2: Índice fuera de rango")
             print("r1.2:", v[indice_r2].obtener_identificador_pago())
     # ----------------------------------------------------------------
 
@@ -122,7 +156,7 @@ def mostrar_archivo_bin(nombre):
 def buscar_envio(v):
     idd = input("Ingresa una identificacion de destinatario a buscar: ")
     r = busqueda_binaria(idd, v)
-    print("r: ", r)
+
     if r != -1:
         print("r3.1: ", v[r].monto_nominal)
         incremento = v[r].monto_nominal * 1.17
@@ -153,12 +187,6 @@ def mayor_monto_por_moneda(envios):
             matriz_envios[f][c] = envio
 
     return matriz_envios
-
-
-def mostrar_matriz(matriz_envios):
-    for f in range(5):
-        for c in range(5):
-            print("r4.1: ", matriz_envios[f][c].codigo)
 
 
 def monto_final(monto_base, alg_imp):
@@ -273,9 +301,11 @@ def principal():
         elif op == 4:
             matriz_envios = mayor_monto_por_moneda(v)
             mostrar_matriz(matriz_envios)
+
         elif op == 0:
             print("Programa finalizado.")
 
 
 if __name__ == '__main__':
     principal()
+
